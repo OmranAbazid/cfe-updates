@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+
+<body>
+  <table class="table table-bordered">
+    <thead style="background: #9c0059; color:white; ">
+      <tr>
+        <td>
+          info
+        </td>
+        <td width="150px">
+          Date
+        </td>
+      </tr>
+    </thead>
+    <tbody id="content">
+    </tbody>
+  </table>
+  <div class="results"></div>
+</body>
+<script>
+  if ('XDomainRequest' in window && window.XDomainRequest !== null) {
+    jQuery.ajaxSettings.xhr = function() {
+      try {
+        return new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (e) {}
+
+      jQuery.support.cors = true;
+    }
+  }
+  jQuery.support.cors = true;
+  var spreadsheetID = "1cwtvJ7E5nNBvY6eSAdX1KjmzkODnI4nC1NtJSnaJKQA";
+  $.ajax({
+      type: 'GET',
+      url: "https://spreadsheets.google.com/feeds/list/" + spreadsheetID + "/od6/public/values?alt=json",
+      async: true,
+      cache: false,
+      crossDomain: true,
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'jsonp',
+      success: function(data) {
+        var entry = data.feed.entry;
+        var output = "";
+        entry.reverse();
+        $(entry).each(function() {
+          if (this.gsx$text2.$t) {
+            output += "<tr>";
+            output += "<td><p>" + this.gsx$text2.$t + "</p></td><td align='center'>" + this.gsx$date2.$t;
+            output += "</tr>";
+          }
+        });
+        $('#content').html(output);
+      }
+
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      console.log('ERROR: ' + errorThrown);
+    })
+    .always(function() {});
+</script>
+
+</html>
